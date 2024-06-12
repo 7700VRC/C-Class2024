@@ -80,6 +80,29 @@ Brain.Screen.drawCircle(x,y,5);
     }
 }
 }
+
+void dk(){
+  Brain.Screen.printAt(1,20,"running dk");
+  int x = 0;
+  int y = 0;
+  bool down=true;
+  while(true){
+  x++;
+  if (y<256 && down){
+    down=true;
+    y+=10;
+  }
+  else {
+    down=false;
+    y=y-10;
+    if (y<=1){
+      down=true;
+    }
+  }
+  Brain.Screen.setFillColor(blue);
+Brain.Screen.drawCircle(x,y,5);
+  }
+}
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -94,7 +117,9 @@ void pre_auton(void) {
 
 //connor();
 
-william();
+//william();
+
+dk();
   
 }
 
@@ -109,6 +134,9 @@ william();
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+
+   Brain.Screen.printAt(1,40,"running auton");
+
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
