@@ -14,6 +14,11 @@ using namespace vex;
 // define your global instances of motors and other devices here
 brain  Brain;
 controller Controller1 = controller(primary);
+motor LF = motor(PORT1, ratio18_1, false);
+motor RF = motor(PORT9, ratio18_1, true);
+motor LB = motor(PORT3, ratio18_1, false);
+motor RB = motor(PORT6, ratio18_1, true);
+
 
 
 
@@ -22,7 +27,70 @@ bool RemoteControlCodeEnabled = true;
 // A global instance of competition
 competition Competition;
 
-// define your global instances of motors and other devices here
+// define your global variables
+float D=4.0;  //wheel diameter
+float G=1.0;  //Gear ratio external
+float PI= 3.14;  //math constant of circles
+
+//custom functions
+
+void drive(int lspeed, int rspeed, int wt){
+  LF.spin(fwd,lspeed,percent);
+  LB.spin(fwd,lspeed,percent);
+  RF.spin(fwd,rspeed,percent);
+  RB.spin(fwd,rspeed,percent);
+  wait(wt,msec);
+}
+
+void driveBrake(){
+  LF.stop(brake);
+  LB.stop(brake);
+  RF.stop(brake);
+  RB.stop(brake);
+}
+
+void inchDriveBangBang(float target){
+  float x=0;
+  float speed =50;
+LF.setPosition(0.0, rev);
+while(x<target){
+drive(speed,speed,10);
+x=LF.position(rev)*PI*D*G;
+}
+driveBrake();
+}
+
+void inchDriveP(float target){
+  float x=0;
+  float error=target;
+  float kp=1.0;
+  float speed =kp*error;
+  float accuracy=1.0;
+LF.setPosition(0.0, rev);
+while(error>accuracy){
+drive(speed,speed,10);
+x=LF.position(rev)*PI*D*G;
+error=target-x;
+speed=kp*error;
+}
+driveBrake();
+}
+
+void inchDrivePfabs(float target){
+  float x=0;
+  float error=target;
+  float kp=1.0;
+  float speed =kp*error;
+  float accuracy=1.0;
+LF.setPosition(0.0, rev);
+while(fabs(error)>accuracy){
+drive(speed,speed,10);
+x=LF.position(rev)*PI*D*G;
+error=target-x;
+speed=kp*error;
+}
+driveBrake();
+}
 
 void connor(void) {
   int x = 0 ; 
