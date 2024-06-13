@@ -4,9 +4,9 @@
 		"json": 2
 	},
 	"project": {
-		"name": "OnlineC-class",
-		"description": "June 2024 online class",
-		"creationDate": "6/5/2024, 6:08:47 PM",
+		"name": "driveDK",
+		"description": "first day moving robot\n",
+		"creationDate": "6/12/2024, 6:10:17 PM",
 		"platform": "V5",
 		"language": "cpp",
 		"slot": 1,
