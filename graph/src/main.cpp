@@ -17,12 +17,50 @@ competition Competition;
 // define your global instances of motors and other devices here
 brain  Brain;
 controller Controller1 = controller(primary);
+motor LF = motor(PORT2, ratio6_1, false);
+motor LM = motor(PORT15, ratio6_1, true);
+motor LB = motor(PORT14, ratio6_1, false);
+motor RF = motor(PORT9, ratio6_1, true);
+motor RM = motor(PORT16, ratio6_1, false);
+motor RB = motor(PORT17, ratio6_1, true);
+// define your global variables
+float D=2.75;  //wheel diameter
+float G=1.0;  //Gear ratio external
+float PI= 3.14;  //math constant of circles
+
+//custom functions
+
+void drive(int lspeed, int rspeed, int wt){
+  LF.spin(fwd,lspeed,percent);
+  LB.spin(fwd,lspeed,percent);
+  RF.spin(fwd,rspeed,percent);
+  RB.spin(fwd,rspeed,percent);
+  wait(wt,msec);
+}
+
+void driveBrake(){
+  LF.stop(brake);
+   LM.stop(brake);
+  LB.stop(brake);
+  RF.stop(brake);
+   RM.stop(brake);
+  RB.stop(brake);
+}
+
+void driveCoast(){
+  LF.stop(coast);
+  LM.stop(coast);
+  LB.stop(coast);
+  RF.stop(coast);
+  RM.stop(coast);
+  RB.stop(coast);
+}
 
 void drawAxis(){
   int x=0;
   int y=0;
   while(x<480){
-Brain.Screen.printAt(x,20,"%d",x);
+Brain.Screen.printAt(x,20,"%d",x/50);
 x=x+50;
 }
  while(y<272){
@@ -31,7 +69,7 @@ y=y+50;
 }
 }
 
-void drawPoints(int x, int y, int r=2){
+void drawPoints(float x, int y, int r=2){
   Brain.Screen.drawCircle(x,y,r);
 }
 
@@ -43,6 +81,57 @@ void drawMyLine(float m, float b){
     drawPoints(x,y);
     x= x + 10;
   }
+}
+
+void speedGraph(){
+  int count=0;
+  int speed= 0;
+  int flag=0;
+  float x=0.0;
+  LF.setPosition(0,rev);
+  float t=0.0;
+     Brain.Screen.setFillColor(green);
+  Brain.Screen.setPenColor(green);
+
+  while(t<10&&flag<2){
+  drive(100,100,10);
+  t=t+.01;
+  count++;
+  speed=LF.velocity(pct);
+  if(speed>=100){
+    flag++;
+  }
+  else flag=0;
+  if(count>=5){
+    count=0;
+    drawPoints(t*50+100,speed);
+  }
+
+  }
+x= LF.position(rev)*PI*D*G;
+  Brain.Screen.setFillColor(transparent);
+  Brain.Screen.setPenColor(white);
+  Brain.Screen.printAt(200, 170, "time = %.3f sec", t);
+    Brain.Screen.printAt(200, 200, "distance = %.3f inch", x);
+  
+  
+ Brain.Screen.setFillColor(red);
+  Brain.Screen.setPenColor(red);
+  while(t<20){
+    drive(0,0,10);
+  //driveCoast();
+  t=t+.01;
+  count++;
+  speed=LF.velocity(pct);
+  if(count>=50){
+    count=0;
+    drawPoints(t*50+100,speed);
+  }
+
+  }
+  driveBrake();
+    Brain.Screen.setFillColor(transparent);
+  Brain.Screen.setPenColor(white);
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -56,10 +145,9 @@ void drawMyLine(float m, float b){
 
 void pre_auton(void) {
 drawAxis();
-Brain.Screen.setFillColor(red);
-drawMyLine(0.2,100);
-Brain.Screen.setFillColor(blue);
-drawMyLine(-0.3,250);
+  //wait(1000,msec);
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -73,9 +161,7 @@ drawMyLine(-0.3,250);
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  speedGraph();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -91,17 +177,8 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
-
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+    
+    drive(Controller1.Axis3.position(pct),Controller1.Axis2.position(pct),10);
   }
 }
 
@@ -115,6 +192,7 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
+
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
