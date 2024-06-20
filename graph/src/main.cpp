@@ -123,7 +123,7 @@ x= LF.position(rev)*PI*D*G;
   t=t+.01;
   count++;
   speed=LF.velocity(pct);
-  if(count>=50){
+  if(count>=5){
     count=0;
     drawPoints(t*50+100,speed);
   }
