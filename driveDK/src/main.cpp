@@ -21,6 +21,7 @@ motor LF=motor(PORT2, ratio6_1, true);
 motor LB=motor(PORT1, ratio6_1, true);
 motor RF=motor(PORT20, ratio6_1, false);
 motor RB=motor(PORT11, ratio6_1, false);
+inertial Gyro = inertial(PORT12);
 
 
 // global variables
@@ -28,6 +29,11 @@ float PI = 3.14;
 float D = 4.0;
 float G= 3.0 / 7.0;
 
+void gyroPrint()
+{
+float heading = Gyro.rotation(deg);
+Brain.Screen.printAt(1, 60, "heading  =  %.2f. degrees", heading);
+}
 
 void drive(int lspeed, int rspeed, int wt){
   LF.spin(fwd,lspeed,pct);
@@ -56,6 +62,34 @@ void inchDrive(float target){
   
 }
 
+void gyroTurnRight(float target){
+  float heading=0.0;
+  Gyro.setRotation(0.0,deg);
+  while(heading < target){
+    drive(20,-20,10);
+    heading=Gyro.rotation(deg);
+  }
+  driveBrake();
+  Brain.Screen.printAt(1, 60, "heading  =  %.2f. degrees", heading);
+}
+
+void gyroTurnP(float target){
+    float accuracy=1.0;
+    float heading=0.0;
+    float error=target-heading;
+    float kp=0.7;
+    float speed=100.0;
+  Gyro.setRotation(0.0,deg);
+  while(accuracy < fabs(error)){
+    speed=kp*(error)+10*fabs(error)/error;
+    drive(speed,-speed,10);
+    heading=Gyro.rotation(deg);
+    error=target-heading;
+
+  }
+  driveBrake();
+}
+
 void dkDrive(){
   drive(50,50,1000);
   driveBrake();
@@ -65,22 +99,24 @@ void dkDrive(){
 }
 
 void Williamdrive(){
-  inchDrive(84);
+  inchDrive(84);  //drive 48 inch
   wait(250,msec);
-  drive(50,-50,300);
+  drive(50,-50,300);  //gyroTurnP(90)
   driveBrake();
-  inchDrive(42);
+  inchDrive(42);  //24 inch
   wait(250,msec);
-  drive(75,-75,600);
+  drive(75,-75,600); //turn right 90
+
+  // drive forward
   driveBrake();
 }
 
 void LucasDrive(){
-inchDrive(84);
-wait(250,msec);
-drive(50,-50,400);
+inchDrive(60);
 driveBrake();
-inchDrive(72);
+wait(250,msec);
+gyroTurnP(180.0);
+inchDrive(60);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -114,6 +150,9 @@ void autonomous(void) {
 //Williamdrive();
 LucasDrive();
 //inchDrive(72.0);
+
+
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -128,15 +167,8 @@ LucasDrive();
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
-
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+  while (true) {
+ gyroPrint();
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
