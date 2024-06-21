@@ -18,21 +18,21 @@ competition Competition;
 brain  Brain;
 controller Controller1 = controller(primary);
 //7899C
-/*
-motor LF = motor(PORT2, ratio6_1, false);
-motor LM = motor(PORT15, ratio6_1, true);
-motor LB = motor(PORT14, ratio6_1, false);
-motor RF = motor(PORT9, ratio6_1, true);
-motor RM = motor(PORT16, ratio6_1, false);
-motor RB = motor(PORT17, ratio6_1, true);
-// define your global variables
-float D=2.75;  //wheel diameter
-float G=1.0;  //Gear ratio external
-float PI= 3.14;  //math constant of circles
-*/
+
+// motor LF = motor(PORT2, ratio6_1, false);
+// motor LM = motor(PORT15, ratio6_1, true);
+// motor LB = motor(PORT14, ratio6_1, false);
+// motor RF = motor(PORT9, ratio6_1, true);
+// motor RM = motor(PORT16, ratio6_1, false);
+// motor RB = motor(PORT17, ratio6_1, true);
+// // define your global variables
+// float D=2.75;  //wheel diameter
+// float G=1.0;  //Gear ratio external
+// float PI= 3.14;  //math constant of circles
+
 //
 //7899B 
-
+/*
 motor LF = motor(PORT5, ratio6_1, true);
 motor LM = motor(PORT6, ratio6_1, true);
 motor LB = motor(PORT10, ratio6_1, true);
@@ -42,6 +42,19 @@ motor RB = motor(PORT1, ratio6_1, false);
 // define your global variables
 float D=2.75;  //wheel diameter
 float G=3.0/4.0;  //Gear ratio external
+float PI= 3.14;  //math constant of circles
+*/
+//7899B 4inch 
+
+motor LF = motor(PORT11, ratio6_1, true);
+motor LB = motor(PORT1, ratio6_1, true);
+motor RF = motor(PORT20, ratio6_1,false);
+motor RB = motor(PORT10, ratio6_1,false);
+motor RM = motor(PORT2, ratio6_1, true);
+motor LM = motor(PORT3, ratio6_1,true);
+// define your global variables
+float D=4.0;  //wheel diameter
+float G=3.0/6.0;  //Gear ratio external
 float PI= 3.14;  //math constant of circles
 
 //custom functions
@@ -124,11 +137,14 @@ void speedGraph(){
   }
 
   }
+  speed=LF.velocity(rpm)*PI*D*G/60;
 x= LF.position(rev)*PI*D*G;
   Brain.Screen.setFillColor(transparent);
   Brain.Screen.setPenColor(white);
   Brain.Screen.printAt(200, 170, "time = %.3f sec", t);
     Brain.Screen.printAt(200, 200, "distance = %.3f inch", x);
+        Brain.Screen.printAt(200, 240, "speed = %.3f inch/sec", speed);
+
   
   
  Brain.Screen.setFillColor(red);
