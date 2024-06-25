@@ -114,7 +114,7 @@ void drawMyLine(float m, float b){
 
 void speedGraph(){
   int count=0;
-  int speed= 0;
+  float speed= 0;
   int flag=0;
   float x=0.0;
   LF.setPosition(0,rev);
@@ -137,11 +137,17 @@ void speedGraph(){
   }
 
   }
-  speed=LF.velocity(rpm)*PI*D*G/60;
-x= LF.position(rev)*PI*D*G;
+speed=LF.velocity(rpm);
+  Brain.Screen.setFillColor(transparent);
+
+ Brain.Screen.printAt(200,140, "rpm = %.3f rotations/min", speed);
+ 
+  speed=speed*PI*D*G/60;
+  x= LF.position(rev)*PI*D*G;
   Brain.Screen.setFillColor(transparent);
   Brain.Screen.setPenColor(white);
   Brain.Screen.printAt(200, 170, "time = %.3f sec", t);
+ 
     Brain.Screen.printAt(200, 200, "distance = %.3f inch", x);
         Brain.Screen.printAt(200, 240, "speed = %.3f inch/sec", speed);
 
