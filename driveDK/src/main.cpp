@@ -74,14 +74,14 @@ void gyroTurnRight(float target){
 }
 
 void gyroTurnP(float target){
-    float accuracy=1.0;
+    float accuracy=0.5;
     float heading=0.0;
     float error=target-heading;
     float kp=0.7;
     float speed=100.0;
   Gyro.setRotation(0.0,deg);
   while(accuracy < fabs(error)){
-    speed=kp*(error)+10*fabs(error)/error;
+    speed=kp*(error)+5.0*fabs(error)/error;
     drive(speed,-speed,10);
     heading=Gyro.rotation(deg);
     error=target-heading;
@@ -90,33 +90,68 @@ void gyroTurnP(float target){
   driveBrake();
 }
 
-void dkDrive(){
-  drive(50,50,1000);
-  driveBrake();
-  wait(250,msec);
-  drive(50,-50,800);
+void gyroTurnP2(float target){
+  int count=0;
+    float accuracy=1.0;
+    float heading=0.0;
+    float error=target-heading;
+    float kp=0.7;
+    float speed=100.0;
+  Gyro.setRotation(0.0,deg);
+  while(count<10){
+    speed=kp*(error);
+    drive(speed,-speed,10);
+    heading=Gyro.rotation(deg);
+    error=target-heading;
+if(accuracy > fabs(error)){
+  count++;
+}
+else{
+  count=0;
+}
+  }
   driveBrake();
 }
 
-void Williamdrive(){
-  inchDrive(84);  //drive 48 inch
-  wait(250,msec);
-  drive(50,-50,300);  //gyroTurnP(90)
-  driveBrake();
-  inchDrive(42);  //24 inch
-  wait(250,msec);
-  drive(75,-75,600); //turn right 90
+void dkDrive(){
+  int count=1;
+  while(count <=4){
+  inchDrive(48);
+  wait(500,msec);
+  gyroTurnP(90);
+  count=count+1;
+  }
+}
 
-  // drive forward
+void Williamdrive(){
+   for (int i = 0; i < 4; i++) {
+   inchDrive(90);
+  wait(250,msec);
+  gyroTurnP2(90);
+   }
   driveBrake();
 }
 
 void LucasDrive(){
-inchDrive(60);
-driveBrake();
-wait(250,msec);
-gyroTurnP(180.0);
-inchDrive(60);
+ inchDrive(95);  
+  wait(250,msec);
+  gyroTurnP2(90);  
+  driveBrake();
+}
+
+void connorDrive(){
+   inchDrive(100); 
+  wait(250,msec);
+  gyroTurnP(90);
+  driveBrake();
+  inchDrive(100);
+  wait(250, msec);
+  gyroTurnP(90);
+  driveBrake();
+  inchDrive(100);
+  wait(250, msec);
+  gyroTurnP(90);
+  driveBrake();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -147,9 +182,10 @@ void pre_auton(void) {
 
 void autonomous(void) {
 //dkDrive();
-//Williamdrive();
-LucasDrive();
+Williamdrive();
+//LucasDrive();
 //inchDrive(72.0);
+//connorDrive();
 
 
 
