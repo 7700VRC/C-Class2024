@@ -19,7 +19,7 @@ motor RF = motor(PORT20, ratio6_1, false);
 motor LB = motor(PORT1, ratio6_1, true);
 motor RB = motor(PORT11, ratio6_1, false);
 
-
+inertial Gyro = inertial(PORT12);
 
 
 bool RemoteControlCodeEnabled = true;
@@ -48,6 +48,35 @@ void driveBrake(){
   RF.stop(brake);
   RB.stop(brake);
 }
+
+float kp=0.7;
+float accuracy=2.0;
+int stop=20;
+
+void gyroTurnP(float target){
+float heading = 0.0;
+float error= target - heading;
+int speed=0;
+
+int count =0;
+Gyro.setRotation(0.0, degrees);
+while(count<stop){
+speed= kp*error;
+  drive(speed, -speed, 10);
+  heading = Gyro.rotation(degrees);
+  error=target - heading;
+ if (fabs(error)<accuracy){
+  count++;
+ }
+ else{
+  count=0;
+ }
+
+}
+
+driveBrake();
+}
+
 
 void inchDriveBangBang(float target){
   float x=0;
@@ -91,85 +120,80 @@ speed=kp*error;
 }
 driveBrake();
 }
+void TurnR(int lspeed, int rspeed,int wt){
+    LF.spin(fwd, lspeed, pct);
+    LB.spin(fwd, lspeed, pct);
+    RF.spin(reverse, rspeed, pct);
+    RB.spin(reverse, rspeed, pct);
+    wait(wt,msec);
+}
+void GyrocurveP(float target, float curve,float accuracy,int count,float kp){
+    float heading= 0.0;
+    float error= target- heading;
+    int speed=0;
 
-void connor(void) {
-  int x = 0 ; 
-float y=0.0 ;
-int z = 10;
-bool flag = true;
-Brain.Screen.printAt(1,20,"variables");
-Brain.Screen.printAt(1,40," x = %d   ", x);
-Brain.Screen.printAt(1,60, "y = %.2f", y);
-  while (true) {
-   x+=5;
-   y+=2;
-   z=0;
-   Brain.Screen.printAt(1,20,"variables");
-Brain.Screen.printAt(1,40," x = %d   ", x);
-Brain.Screen.printAt(1,60, "y = %.2f", y);
-  Brain.Screen.clearScreen();
- // wait(75, msec); 
-Brain.Screen.setFillColor(orange);
-Brain.Screen.drawRectangle(25,150,50,75);
-Brain.Screen.setFillColor(purple);
-Brain.Screen.drawCircle(170, 150, 50);
-Brain.Screen.drawRectangle(50, 100, 60, 45, 60);
-Brain.Screen.setFillColor(blue);
-Brain.Screen.drawCircle(x,y,10);
-   wait(50, msec); 
-    if (x>400) {
-      x=0;
-      y=0;
-    }
-    }
+    Gyro.setRotation(0.0,degrees);
+    while(count<20){
+        TurnR(speed, -speed/curve, 10);
+        heading=Gyro.rotation(degrees);
+        error= target- heading;
+        speed= kp*error;
+        if(fabs (error)<accuracy){
+            count++;
+        }
+        else{
+            count=0;
+        }
+    };
+driveBrake();
 }
-void william(void) {
-  int x = 0 ; 
-float y=0.0 ;
-int z = 10;
-bool flag = true;
-Brain.Screen.printAt(1,20,"variables");
-Brain.Screen.printAt(1,40," x = %d   ", x);
-Brain.Screen.printAt(1,60, "y = %.2f", y);
-  while (true) {
-   x+=10;
-   y+=5;
-   z=0;
-   Brain.Screen.printAt(1,20,"variables");
-Brain.Screen.printAt(1,40," x = %d   ", x);
-Brain.Screen.printAt(1,60, "y = %.2f", y);
-  Brain.Screen.clearScreen();
-Brain.Screen.setFillColor(blue);
-Brain.Screen.drawCircle(x,y,5);
-    wait(75, msec);
-    if (x>300) {
-      x=0;
-      y=0;
-    }
-}
-}
-
 void dk(){
   Brain.Screen.printAt(1,20,"running dk");
-  int x = 0;
-  int y = 0;
-  bool down=true;
-  while(true){
-  x++;
-  if (y<256 && down){
-    down=true;
-    y+=10;
+  kp=5.0;
+  accuracy= 2.0;
+  stop=20;
+
+  gyroTurnP(135);
+
+  wait(500, msec);
+
+  gyroTurnP(-45);
+
+  
+}
+
+
+  void gyroCode(float target, float curve, float accuracy, int count, float kp){
+    float heading=0.0;
+    float error=target-heading;
+    float speed=100.0;
+  Gyro.setRotation(0.0,deg);
+  while(count<20){
+    speed=kp*(error);
+   if (target>0){
+    drive(speed*curve,speed,10);
+   }
+   else{
+    
+      drive(speed,speed*curve,10);
+   }
+    heading=Gyro.rotation(degrees);
+    error=target-heading;
+if(fabs(error)< accuracy){
+  count++;
+}
+else{
+  count=0;
+}
   }
-  else {
-    down=false;
-    y=y-10;
-    if (y<=1){
-      down=true;
-    }
-  }
-  Brain.Screen.setFillColor(blue);
-Brain.Screen.drawCircle(x,y,5);
-  }
+  driveBrake();
+}
+
+void aaron(){
+  Brain.Screen.printAt(1,20,"running aaron");
+  gyroCode(90, 2, 1.0, 0, 1.0);
+
+  
 }
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -203,12 +227,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
 
-   Brain.Screen.printAt(1,40,"running auton");
-gyroTurnP2(90);
-
-wait(1000,msec);
-
-gyroTurnP2(-90);
+aaron();
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
