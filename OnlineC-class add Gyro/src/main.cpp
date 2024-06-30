@@ -3,7 +3,7 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       georgekirkman                                             */
 /*    Created:      6/5/2024, 6:08:47 PM                                      */
-/*    Description:  V5 project                                                */
+/*    Description:  V5 project    June 30, 2024 add gyro                                            */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@ motor RF = motor(PORT20, ratio6_1, false);
 motor LB = motor(PORT1, ratio6_1, true);
 motor RB = motor(PORT11, ratio6_1, false);
 
-inertial Gyro = inertial(PORT12);
+
 
 
 bool RemoteControlCodeEnabled = true;
@@ -47,28 +47,6 @@ void driveBrake(){
   LB.stop(brake);
   RF.stop(brake);
   RB.stop(brake);
-}
-void gyroTurnP2(float target){
-  int count=0;
-    float accuracy=2.0;
-    float heading=0.0;
-    float error=target-heading;
-    float kp=0.7;
-    float speed=100.0;
-  Gyro.setRotation(0.0,deg);
-  while(count<10){
-    speed=kp*(error);
-    drive(speed,-speed,10);
-    heading=Gyro.rotation(deg);
-    error=target-heading;
-if(accuracy > fabs(error)){
-  count++;
-}
-else{
-  count=0;
-}
-  }
-  driveBrake();
 }
 
 void inchDriveBangBang(float target){
