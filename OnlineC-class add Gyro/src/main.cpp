@@ -14,12 +14,12 @@ using namespace vex;
 // define your global instances of motors and other devices here
 brain  Brain;
 controller Controller1 = controller(primary);
-motor LF = motor(PORT1, ratio18_1, false);
-motor RF = motor(PORT9, ratio18_1, true);
-motor LB = motor(PORT3, ratio18_1, false);
-motor RB = motor(PORT6, ratio18_1, true);
+motor LF = motor(PORT2, ratio6_1, true);
+motor RF = motor(PORT20, ratio6_1, false);
+motor LB = motor(PORT1, ratio6_1, true);
+motor RB = motor(PORT11, ratio6_1, false);
 
-
+inertial Gyro = inertial(PORT12);
 
 
 bool RemoteControlCodeEnabled = true;
@@ -47,6 +47,28 @@ void driveBrake(){
   LB.stop(brake);
   RF.stop(brake);
   RB.stop(brake);
+}
+void gyroTurnP2(float target){
+  int count=0;
+    float accuracy=2.0;
+    float heading=0.0;
+    float error=target-heading;
+    float kp=0.7;
+    float speed=100.0;
+  Gyro.setRotation(0.0,deg);
+  while(count<10){
+    speed=kp*(error);
+    drive(speed,-speed,10);
+    heading=Gyro.rotation(deg);
+    error=target-heading;
+if(accuracy > fabs(error)){
+  count++;
+}
+else{
+  count=0;
+}
+  }
+  driveBrake();
 }
 
 void inchDriveBangBang(float target){
@@ -204,7 +226,11 @@ void pre_auton(void) {
 void autonomous(void) {
 
    Brain.Screen.printAt(1,40,"running auton");
+gyroTurnP2(90);
 
+wait(1000,msec);
+
+gyroTurnP2(-90);
   // ..........................................................................
   // Insert autonomous user code here.
   // ..........................................................................
