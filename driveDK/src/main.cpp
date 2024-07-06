@@ -90,6 +90,7 @@ void gyroTurnP(float target){
   driveBrake();
 }
 
+
 void gyroTurnP2(float target){
   int count=0;
     float accuracy=1.0;
@@ -109,6 +110,25 @@ if(accuracy > fabs(error)){
 else{
   count=0;
 }
+  }
+  driveBrake();
+}
+
+void gyroCurve(float target, float curve){
+    float accuracy=0.5;
+    float heading=0.0;
+    float error=target-heading;
+    float kp=0.7;
+    float speed=100.0;
+  Gyro.setRotation(0.0,deg);
+  if (curve<0) curve=fabs(curve);
+  if (curve>100) curve = 100;
+  while(accuracy < fabs(error)){
+    speed=kp*(error)+5.0*fabs(error)/error;
+    drive(speed+curve,speed-curve,10);
+    heading=Gyro.rotation(deg);
+    error=target-heading;
+
   }
   driveBrake();
 }
